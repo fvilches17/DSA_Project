@@ -1,5 +1,5 @@
 package DSA_Project.Breakout;
-//TODO
+//Yes, everything works perfect!
 import java.awt.Color;
 
 public class Ball {
