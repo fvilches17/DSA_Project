@@ -10,5 +10,5 @@ package DSA_Project.Breakout;
  * @author olga
  */
 public class BallTest {
-    //now we will send the ball to moon or even sun!
+    //now we will send the ball to moon or even sun! //Lol :D
 }
