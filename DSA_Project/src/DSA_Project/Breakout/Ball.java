@@ -1,6 +1,5 @@
 package DSA_Project.Breakout;
-//Yes, everything works perfect!
-//Let's try this one
+
 import java.awt.Color;
 
 public class Ball {
@@ -11,12 +10,12 @@ public class Ball {
     private double velocityY;
     private double radius;
     private double deltaT;
-    private Color color;
+    private final Color DEFAULT_COLOR = Color.MAGENTA;
+    private final int DIAMETER = 50;
     
     //CONSTRUCTOR---------------------------------------------------------------
     public Ball() {
-        this.radius = 10.0;
-        this.color = Color.CYAN;
+        
     }
     
     //GETTERS-------------------------------------------------------------------
@@ -44,8 +43,12 @@ public class Ball {
         return deltaT;
     }
 
-    public Color getColor() {
-        return color;
+    public Color getDEFAULT_COLOR() {
+        return DEFAULT_COLOR;
+    }
+
+    public int getDIAMETER() {
+        return DIAMETER;
     }
 
     //SETTERS-------------------------------------------------------------------
@@ -73,10 +76,6 @@ public class Ball {
         this.deltaT = deltaT;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
     //CLASS METHODS-------------------------------------------------------------
     public void move() {
         positionX += deltaT * velocityX;
@@ -84,27 +83,9 @@ public class Ball {
     }
     
     @Override
-    public String toString() {
+    public String toString() { //Used for debugging purposes
         return "position(" + positionX + ", " + positionY + "), "
                 + "velocity(" + velocityX + ", " + velocityY + "), "
                 + "deltaT(" + deltaT + "), radius(" + radius + ")";
-    }
-    
-    //TESTING BALL VALUES
-    public static void main(String[] args) {
-        int iteration = -1;
-        Ball ball = new Ball();
-        ball.setPositionX(16 + 480 * Math.random());
-        ball.setPositionY(16 + 480 * Math.random());
-        ball.setVelocityX(10 + 5 * Math.random());
-        ball.setVelocityY(10 + 5 * Math.random());
-        ball.setColor(Color.getHSBColor((float) Math.random(), 1.0f, 1.0f));
-        ball.setRadius(20);
-        ball.setDeltaT(1.0);
-
-        while (iteration++ < 100) {
-            System.out.println(ball);
-            ball.move();
-        }
     }
 }
