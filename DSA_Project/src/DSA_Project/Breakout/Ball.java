@@ -1,8 +1,9 @@
 package DSA_Project.Breakout;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public class Ball {
+public class Ball implements Serializable {
     //FIELDS--------------------------------------------------------------------
     private double positionX;
     private double positionY;

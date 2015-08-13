@@ -53,7 +53,7 @@ public class Game extends JPanel implements Runnable {
     //METHODS-------------------------------------------------------------------
     public void createBricks() {
         //Setting start location for bricks to be layed out.
-        int startPointX = ((DEFAULT_FRAME_WIDTH - 700) / 2) - BRICK_WIDTH / 2; //TODO add more standard calculation
+        int startPointX = ((DEFAULT_FRAME_WIDTH - 500) / 2) - BRICK_WIDTH / 2; //TODO add more standard calculation
         int startPointY = 50;
         //Setting default colors for brick rows
         ArrayList<Color> colors = new ArrayList<>(); //TODO find more standard way, e.g., what if there were 6 rows
