@@ -1,14 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package DSA_Project.Breakout;
 
-/**
- *
- * @author Francisco
- */
-public class TestClass {
-    
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class TestClass implements Serializable {
+    public static void main(String[] args) {
+        ArrayList<Ball> balls = new ArrayList<Ball>();
+        Ball ball = new Ball();
+        balls.add(ball);
+        FileAccessor.writeArrayIntoFile(balls, "balls.bin");
+        
+        ArrayList<Ball> balls2 = new ArrayList<Ball>();
+        
+        balls2 = (ArrayList<Ball>) FileAccessor.getArrayFromFile("balls.bin");
+        //System.out.println(balls2.get(0));
+    }
 }
