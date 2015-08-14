@@ -13,21 +13,23 @@ import javax.swing.JPanel;
 public class Game extends JPanel implements Runnable {
 
     //FIELDS--------------------------------------------------------------------
-    //Setting Fields for Frame
+    //Setting Fields and default values for Frame
     private final int DEFAULT_FRAME_WIDTH = 1000;
     private final int DEFAULT_FRAME_HEIGHT = 700;
 
-    //Setting Fields for Bricks
-    private final int DEFAULT_NUM_BRICKS = 40; //HAS TO BE MULTIPLE OF 10!
-    private final int BRICK_WIDTH = 70;
+    //Setting Fields and default values for Bricks
+    private final Color[] BRICK_COLORS = {Color.red, Color.blue, Color.green, Color.yellow, Color.cyan};
+    private final int BRICK_WIDTH = 60;
     private final int BRICK_HEIGHT = 20;
+    private final int NUM_BRICKS_PER_LINE = 10;
     private ArrayList<Brick> bricks = new ArrayList<Brick>();
 
-    //Setting fields for Ball
-    //TODO better to set standard final fields for ball here, instead of within the ball class
-    private final Ball ball = new Ball();
+    //Setting fields and default values for Ball
+    private final double BALL_RADIUS = 40.0;
+    private final Color BALL_COLOR = Color.MAGENTA;
+    private final Ball ball = new Ball(BALL_RADIUS, BALL_COLOR);
 
-    //Setting Fields for Paddle
+    //Setting Fields and default values for Paddle
     private final int PADDLE_WIDTH = 175;
     private final int PADDLE_HEIGHT = 10;
     private final int PADDLE_Y_POSITION = 600;
@@ -48,61 +50,59 @@ public class Game extends JPanel implements Runnable {
         frame.setSize(DEFAULT_FRAME_WIDTH, DEFAULT_FRAME_HEIGHT);
         frame.setLocationRelativeTo(null);
         frame.setContentPane(this);
+        frame.setResizable(false);
     }
 
     //METHODS-------------------------------------------------------------------
     public void createBricks() {
         //Setting start location for bricks to be layed out.
-        int startPointX = ((DEFAULT_FRAME_WIDTH - 500) / 2) - BRICK_WIDTH / 2; //TODO add more standard calculation
-        int startPointY = 50;
-        //Setting default colors for brick rows
-        ArrayList<Color> colors = new ArrayList<>(); //TODO find more standard way, e.g., what if there were 6 rows
-        colors.add(Color.red); //Row1
-        colors.add(Color.blue); //Row2
-        colors.add(Color.yellow); //Row3
-        colors.add(Color.green); //Row4
+        int startPointX = ((DEFAULT_FRAME_WIDTH - NUM_BRICKS_PER_LINE * BRICK_WIDTH) / 2) - BRICK_WIDTH/(BRICK_WIDTH/10);
+        int startPointY = 95;
+        
         //Creating bricks
-        for (int j = 0; j < 4; j++) {
-            for (int i = 0; i < DEFAULT_NUM_BRICKS / 4; i++) { //get more standard variable, instead of 4
+        for (int j = 0; j < BRICK_COLORS.length; j++) {
+            for (int i = 0; i < NUM_BRICKS_PER_LINE ; i++) { 
                 this.bricks.add(new Brick(
-                        startPointX, startPointY, BRICK_WIDTH, BRICK_HEIGHT, colors.get(j), j + 1));
+                        startPointX, startPointY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLORS[j], j + 1));
                 //Setting new brick layout location to the right of last brick layed out
                 startPointX += BRICK_WIDTH;
             }
             //Setting new row
             startPointY += BRICK_HEIGHT;
-            startPointX = ((DEFAULT_FRAME_WIDTH - 500) / 2) - BRICK_WIDTH / 2;
+            startPointX = ((DEFAULT_FRAME_WIDTH - NUM_BRICKS_PER_LINE * BRICK_WIDTH) / 2) - BRICK_WIDTH/(BRICK_WIDTH/10);
         }
     }
 
     @Override
     public void paintComponent(Graphics g) {
+        //Default paint settings
         super.paintComponents(g);
         g.clearRect(0, 0, this.getWidth(), this.getHeight());
 
         //Painting Bricks
-        for (Brick b : bricks) {
-            g.setColor(b.getColor());
-            g.fill3DRect(b.getLocationX(), b.getLocationY(), b.getWidth(), b.getHeight(), true);
+        for (Brick brick : bricks) {
+            g.setColor(brick.getColor());
+            g.fill3DRect((int)brick.getLocationX(), (int)brick.getLocationY(), (int)brick.getWidth(), (int)brick.getHeight(), true);
         }
 
         //Painting Ball
-        g.setColor(this.ball.getDEFAULT_COLOR());
-        g.fillOval((int) this.ball.getPositionX(), (int) this.ball.getPositionY(), this.ball.getDIAMETER(), this.ball.getDIAMETER());
+        g.setColor(this.ball.getColor());
+        g.fillOval((int)this.ball.getPositionX(), (int)this.ball.getPositionY(),
+                   (int)this.ball.getRadius(), (int)this.ball.getRadius());
 
         //Painting Paddle
         g.setColor(this.paddle.getColor());
         g.fillRect(this.paddle.getLocationX(), this.paddle.getLocationY(),
-                this.paddle.getWidth(), this.paddle.getHeight());
-
+                   this.paddle.getWidth(), this.paddle.getHeight());
     }
 
     @Override
     public void run() {
-        int xMovement = 2;
-        int yMovement = 2;
-        this.ball.setPositionX(this.getWidth() / 2 - this.ball.getDIAMETER() / 2);
-        this.ball.setPositionY(this.getHeight() / 2);
+        //TODO ball direction has to be random every time the game starts
+        double xMovement = 0.7;
+        double yMovement = 2.0;
+        this.ball.setPositionX(this.getWidth() / 2.0 - this.ball.getRadius() / 2.0);
+        this.ball.setPositionY(this.getHeight() / 2.0);
         while (true) {
             this.ball.setPositionX(this.ball.getPositionX() + xMovement);
             this.ball.setPositionY(this.ball.getPositionY() + yMovement);
@@ -110,7 +110,7 @@ public class Game extends JPanel implements Runnable {
             //Bounce if ball touches paddle
             if ((this.ball.getPositionX() > this.paddle.getLocationX() - PADDLE_WIDTH
                     && this.ball.getPositionX() < this.paddle.getLocationX() + PADDLE_WIDTH)
-                    && (this.ball.getPositionY() == PADDLE_Y_POSITION - ball.getDIAMETER())) {
+                    && ((int)this.ball.getPositionY() == PADDLE_Y_POSITION - ball.getRadius())) {
                 xMovement *= -1;
                 yMovement *= -2; //TODO use delta x here instead
             }
