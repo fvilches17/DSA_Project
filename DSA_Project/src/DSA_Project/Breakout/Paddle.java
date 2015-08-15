@@ -22,6 +22,4 @@ public class Paddle extends Block {
         this.setLocationX(this.getLocationX() - DISPLACEMENT);
         
     }
-    
-    
 }

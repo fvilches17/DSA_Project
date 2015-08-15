@@ -10,7 +10,6 @@ public abstract class Block {
     private boolean isVisible;
     
     //CONSTRUCTOR
-
     public Block(int locationX, int locationY, int width, int height, Color color) {
         this.locationX = locationX;
         this.locationY = locationY;
@@ -72,13 +71,5 @@ public abstract class Block {
     }
     
     //METHODS-------------------------------------------------------------------
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    //TODO add methods?
 }

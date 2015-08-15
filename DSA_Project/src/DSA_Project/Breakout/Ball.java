@@ -11,12 +11,12 @@ public class Ball implements Serializable {
     private double velocityY;
     private double radius;
     private double deltaT;
-    private final Color DEFAULT_COLOR = Color.MAGENTA;
-    private final int DIAMETER = 50;
+    private Color color;
     
     //CONSTRUCTOR---------------------------------------------------------------
-    public Ball() {
-        
+    public Ball(double radius, Color color) {
+        this.setRadius(radius);
+        this.setColor(color);
     }
     
     //GETTERS-------------------------------------------------------------------
@@ -44,12 +44,8 @@ public class Ball implements Serializable {
         return deltaT;
     }
 
-    public Color getDEFAULT_COLOR() {
-        return DEFAULT_COLOR;
-    }
-
-    public int getDIAMETER() {
-        return DIAMETER;
+    public Color getColor() {
+        return color;
     }
 
     //SETTERS-------------------------------------------------------------------
@@ -75,6 +71,10 @@ public class Ball implements Serializable {
 
     public void setDeltaT(double deltaT) {
         this.deltaT = deltaT;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     //CLASS METHODS-------------------------------------------------------------
