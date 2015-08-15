@@ -99,21 +99,46 @@ public class Game extends JPanel implements Runnable {
     @Override
     public void run() {
         //TODO ball direction has to be random every time the game starts
-        double xMovement = 0.7;
-        double yMovement = 2.0;
+        double xMovement = 100.0;
+        double yMovement = 5000.0;
+        double n = Math.sqrt(xMovement * xMovement + yMovement * yMovement);
+        ball.setVelocityX(xMovement / n);
+        ball.setVelocityY(yMovement / n);
+        ball.setDeltaT(2.20);
+        
+        /*
         this.ball.setPositionX(this.getWidth() / 2.0 - this.ball.getRadius() / 2.0);
-        this.ball.setPositionY(this.getHeight() / 2.0);
+        this.ball.setPositionY(this.getHeight() / 2.0 - this.ball.getRadius() / 2.0);
+        */
         while (true) {
+            //Moving  ball
+            ball.move();
+            /*
             this.ball.setPositionX(this.ball.getPositionX() + xMovement);
             this.ball.setPositionY(this.ball.getPositionY() + yMovement);
+            */
 
             //Bounce if ball touches paddle
-            if ((this.ball.getPositionX() > this.paddle.getLocationX() - PADDLE_WIDTH
-                    && this.ball.getPositionX() < this.paddle.getLocationX() + PADDLE_WIDTH)
-                    && ((int)this.ball.getPositionY() == PADDLE_Y_POSITION - ball.getRadius())) {
+            if ((this.ball.getPositionX() > this.paddle.getLocationX() - PADDLE_WIDTH) &&
+                (this.ball.getPositionX() < this.paddle.getLocationX() + PADDLE_WIDTH) &&
+                (this.ball.getPositionY() > PADDLE_Y_POSITION - BALL_RADIUS)) {
+                ball.setDeltaT(ball.getDeltaT()*-1);
+                /*
                 xMovement *= -1;
                 yMovement *= -2; //TODO use delta x here instead
+                */
             }
+            
+            //Bounce if ball touches a wall
+            if((this.ball.getPositionX() + this.ball.getRadius() > this.getWidth()) || (this.ball.getPositionX() < 0) ||
+                (this.ball.getPositionY() + this.ball.getRadius() > this.getHeight()) || 
+                (this.ball.getPositionY() < 0)) {
+                xMovement *= -1;
+                yMovement *= -1; //TODO use delta x here instead
+            }
+                  
+                
+            
 
             try {
                 Thread.sleep(15);
@@ -145,6 +170,7 @@ public class Game extends JPanel implements Runnable {
             }
         });
         game.run();
+        
     }
 
 }
