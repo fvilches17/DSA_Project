@@ -1,5 +1,6 @@
 package DSA_Project.Breakout;
 
+//IMPORTS-----------------------------------------------------------------------
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
@@ -10,8 +11,8 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+//CLASS-------------------------------------------------------------------------
 public class Game extends JPanel implements Runnable {
-
     //FIELDS--------------------------------------------------------------------
     //Setting Fields and default values for Frame
     private final int DEFAULT_FRAME_WIDTH = 1000;
@@ -56,12 +57,12 @@ public class Game extends JPanel implements Runnable {
     //METHODS-------------------------------------------------------------------
     public void createBricks() {
         //Setting start location for bricks to be layed out.
-        int startPointX = ((DEFAULT_FRAME_WIDTH - NUM_BRICKS_PER_LINE * BRICK_WIDTH) / 2) - BRICK_WIDTH/(BRICK_WIDTH/10);
+        int startPointX = ((DEFAULT_FRAME_WIDTH - NUM_BRICKS_PER_LINE * BRICK_WIDTH) / 2) - BRICK_WIDTH / (BRICK_WIDTH / 10);
         int startPointY = 95;
-        
+
         //Creating bricks
         for (int j = 0; j < BRICK_COLORS.length; j++) {
-            for (int i = 0; i < NUM_BRICKS_PER_LINE ; i++) { 
+            for (int i = 0; i < NUM_BRICKS_PER_LINE; i++) {
                 this.bricks.add(new Brick(
                         startPointX, startPointY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLORS[j], j + 1));
                 //Setting new brick layout location to the right of last brick layed out
@@ -69,7 +70,7 @@ public class Game extends JPanel implements Runnable {
             }
             //Setting new row
             startPointY += BRICK_HEIGHT;
-            startPointX = ((DEFAULT_FRAME_WIDTH - NUM_BRICKS_PER_LINE * BRICK_WIDTH) / 2) - BRICK_WIDTH/(BRICK_WIDTH/10);
+            startPointX = ((DEFAULT_FRAME_WIDTH - NUM_BRICKS_PER_LINE * BRICK_WIDTH) / 2) - BRICK_WIDTH / (BRICK_WIDTH / 10);
         }
     }
 
@@ -82,18 +83,18 @@ public class Game extends JPanel implements Runnable {
         //Painting Bricks
         for (Brick brick : bricks) {
             g.setColor(brick.getColor());
-            g.fill3DRect((int)brick.getLocationX(), (int)brick.getLocationY(), (int)brick.getWidth(), (int)brick.getHeight(), true);
+            g.fill3DRect((int) brick.getLocationX(), (int) brick.getLocationY(), (int) brick.getWidth(), (int) brick.getHeight(), true);
         }
 
         //Painting Ball
         g.setColor(this.ball.getColor());
-        g.fillOval((int)this.ball.getPositionX(), (int)this.ball.getPositionY(),
-                   (int)this.ball.getRadius(), (int)this.ball.getRadius());
+        g.fillOval((int) this.ball.getPositionX(), (int) this.ball.getPositionY(),
+                (int) this.ball.getRadius(), (int) this.ball.getRadius());
 
         //Painting Paddle
         g.setColor(this.paddle.getColor());
         g.fillRect(this.paddle.getLocationX(), this.paddle.getLocationY(),
-                   this.paddle.getWidth(), this.paddle.getHeight());
+                this.paddle.getWidth(), this.paddle.getHeight());
     }
 
     @Override
@@ -105,41 +106,36 @@ public class Game extends JPanel implements Runnable {
         ball.setVelocityX(xMovement / n);
         ball.setVelocityY(yMovement / n);
         ball.setDeltaT(2.20);
-        
+
         /*
-        this.ball.setPositionX(this.getWidth() / 2.0 - this.ball.getRadius() / 2.0);
-        this.ball.setPositionY(this.getHeight() / 2.0 - this.ball.getRadius() / 2.0);
-        */
+         this.ball.setPositionX(this.getWidth() / 2.0 - this.ball.getRadius() / 2.0);
+         this.ball.setPositionY(this.getHeight() / 2.0 - this.ball.getRadius() / 2.0);
+         */
         while (true) {
             //Moving  ball
             ball.move();
             /*
-            this.ball.setPositionX(this.ball.getPositionX() + xMovement);
-            this.ball.setPositionY(this.ball.getPositionY() + yMovement);
-            */
+             this.ball.setPositionX(this.ball.getPositionX() + xMovement);
+             this.ball.setPositionY(this.ball.getPositionY() + yMovement);
+             */
 
             //Bounce if ball touches paddle
-            if ((this.ball.getPositionX() > this.paddle.getLocationX() - PADDLE_WIDTH) &&
-                (this.ball.getPositionX() < this.paddle.getLocationX() + PADDLE_WIDTH) &&
-                (this.ball.getPositionY() > PADDLE_Y_POSITION - BALL_RADIUS)) {
-                ball.setDeltaT(ball.getDeltaT()*-1);
+            if ((this.ball.getPositionX() > this.paddle.getLocationX() - PADDLE_WIDTH)
+                    && (this.ball.getPositionX() < this.paddle.getLocationX() + PADDLE_WIDTH)
+                    && (this.ball.getPositionY() > PADDLE_Y_POSITION - BALL_RADIUS)) {
+                ball.setDeltaT(ball.getDeltaT() * -1);
                 /*
-                xMovement *= -1;
-                yMovement *= -2; //TODO use delta x here instead
-                */
+                 xMovement *= -1;
+                 yMovement *= -2; //TODO use delta x here instead
+                 */
             }
-            
             //Bounce if ball touches a wall
-            if((this.ball.getPositionX() + this.ball.getRadius() > this.getWidth()) || (this.ball.getPositionX() < 0) ||
-                (this.ball.getPositionY() + this.ball.getRadius() > this.getHeight()) || 
-                (this.ball.getPositionY() < 0)) {
+            if ((this.ball.getPositionX() + this.ball.getRadius() > this.getWidth()) || (this.ball.getPositionX() < 0)
+                    || (this.ball.getPositionY() + this.ball.getRadius() > this.getHeight())
+                    || (this.ball.getPositionY() < 0)) {
                 xMovement *= -1;
                 yMovement *= -1; //TODO use delta x here instead
             }
-                  
-                
-            
-
             try {
                 Thread.sleep(15);
                 repaint();
@@ -148,7 +144,8 @@ public class Game extends JPanel implements Runnable {
             }
         }
     }
-
+    
+    //MAIN METHOD---------------------------------------------------------------
     public static void main(String[] args) {
         JFrame frame = new JFrame("Breakout!");
         Game game = new Game(frame);
@@ -170,7 +167,5 @@ public class Game extends JPanel implements Runnable {
             }
         });
         game.run();
-        
     }
-
 }
