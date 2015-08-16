@@ -123,6 +123,7 @@ public class Game extends JPanel implements Runnable {
             if ((this.ball.getPositionX() > this.paddle.getLocationX() - PADDLE_WIDTH)
                     && (this.ball.getPositionX() < this.paddle.getLocationX() + PADDLE_WIDTH)
                     && (this.ball.getPositionY() > PADDLE_Y_POSITION - BALL_RADIUS)) {
+                ball.setColor(Color.BLACK);
                 ball.setDeltaT(ball.getDeltaT() * -1);
                 /*
                  xMovement *= -1;
