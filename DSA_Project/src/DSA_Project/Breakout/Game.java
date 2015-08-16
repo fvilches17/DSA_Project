@@ -20,15 +20,22 @@ public class Game extends JPanel implements Runnable {
 
     //Setting Fields and default values for Bricks
     private final Color[] BRICK_COLORS = {Color.red, Color.blue, Color.green, Color.yellow, Color.cyan};
-    private final int BRICK_WIDTH = 60;
+    private final int BRICK_WIDTH = 70;
     private final int BRICK_HEIGHT = 20;
     private final int NUM_BRICKS_PER_LINE = 10;
     private ArrayList<Brick> bricks = new ArrayList<Brick>();
 
-    //Setting fields and default values for Ball
-    private final double BALL_RADIUS = 40.0;
+    //Setting fields and default initial values for the main Ball
+    private boolean isBallGoingDown;
     private final Color BALL_COLOR = Color.MAGENTA;
-    private final Ball ball = new Ball(BALL_RADIUS, BALL_COLOR);
+    private final double BALL_RADIUS = 35.0;
+    private final double BALL_X_POSITION = (DEFAULT_FRAME_WIDTH / 2.0) - BALL_RADIUS / 2.0;
+    private final double BALL_Y_POSITION = (DEFAULT_FRAME_HEIGHT / 2.0) - BALL_RADIUS / 2.0;
+    private final double BALL_X_VELOCITY = 4.0;
+    private final double BALL_Y_VELOCITY = 5.0;
+    private final double BALL_DELTA = 1.0; //TODO defines velocity, need to relate to level chosen by player
+    private Ball ball = new Ball(BALL_X_POSITION, BALL_Y_POSITION, BALL_X_VELOCITY, 
+                                 BALL_Y_VELOCITY, BALL_RADIUS, BALL_DELTA, BALL_COLOR);
 
     //Setting Fields and default values for Paddle
     private final int PADDLE_WIDTH = 175;
@@ -36,8 +43,8 @@ public class Game extends JPanel implements Runnable {
     private final int PADDLE_Y_POSITION = 600;
     private final int PADDLE_X_START = (DEFAULT_FRAME_WIDTH / 2) - PADDLE_WIDTH / 2;
     private final Color PADDLE_COLOR = Color.DARK_GRAY;
-    private final Paddle paddle = new Paddle(PADDLE_X_START,
-            PADDLE_Y_POSITION, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
+    private final Paddle paddle = new Paddle(PADDLE_X_START, PADDLE_Y_POSITION, 
+                                             PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
 
     //CONSTRUCTOR--------------------------------------------------------------
     public Game(JFrame frame) {
@@ -58,13 +65,12 @@ public class Game extends JPanel implements Runnable {
     public void createBricks() {
         //Setting start location for bricks to be layed out.
         int startPointX = ((DEFAULT_FRAME_WIDTH - NUM_BRICKS_PER_LINE * BRICK_WIDTH) / 2) - BRICK_WIDTH / (BRICK_WIDTH / 10);
-        int startPointY = 95;
+        int startPointY = 115;
 
         //Creating bricks
         for (int j = 0; j < BRICK_COLORS.length; j++) {
             for (int i = 0; i < NUM_BRICKS_PER_LINE; i++) {
-                this.bricks.add(new Brick(
-                        startPointX, startPointY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLORS[j], j + 1));
+                this.bricks.add(new Brick(startPointX, startPointY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLORS[j], j + 1));
                 //Setting new brick layout location to the right of last brick layed out
                 startPointX += BRICK_WIDTH;
             }
@@ -82,8 +88,10 @@ public class Game extends JPanel implements Runnable {
 
         //Painting Bricks
         for (Brick brick : bricks) {
-            g.setColor(brick.getColor());
-            g.fill3DRect((int) brick.getLocationX(), (int) brick.getLocationY(), (int) brick.getWidth(), (int) brick.getHeight(), true);
+            if (brick.isVisible()) {
+                g.setColor(brick.getColor());
+                g.fill3DRect((int) brick.getLocationX(), (int) brick.getLocationY(), (int) brick.getWidth(), (int) brick.getHeight(), true);
+            }
         }
 
         //Painting Ball
@@ -99,44 +107,91 @@ public class Game extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        //TODO ball direction has to be random every time the game starts
-        double xMovement = 100.0;
-        double yMovement = 5000.0;
-        double n = Math.sqrt(xMovement * xMovement + yMovement * yMovement);
-        ball.setVelocityX(xMovement / n);
-        ball.setVelocityY(yMovement / n);
-        ball.setDeltaT(2.20);
-
-        /*
-         this.ball.setPositionX(this.getWidth() / 2.0 - this.ball.getRadius() / 2.0);
-         this.ball.setPositionY(this.getHeight() / 2.0 - this.ball.getRadius() / 2.0);
-         */
         while (true) {
-            //Moving  ball
-            ball.move();
-            /*
-             this.ball.setPositionX(this.ball.getPositionX() + xMovement);
-             this.ball.setPositionY(this.ball.getPositionY() + yMovement);
-             */
-
+            this.ball.move();
+                  
             //Bounce if ball touches paddle
-            if ((this.ball.getPositionX() > this.paddle.getLocationX() - PADDLE_WIDTH)
-                    && (this.ball.getPositionX() < this.paddle.getLocationX() + PADDLE_WIDTH)
-                    && (this.ball.getPositionY() > PADDLE_Y_POSITION - BALL_RADIUS)) {
-                ball.setColor(Color.BLACK);
-                ball.setDeltaT(ball.getDeltaT() * -1);
-                /*
-                 xMovement *= -1;
-                 yMovement *= -2; //TODO use delta x here instead
-                 */
+            if ((ball.getPositionX() + ball.getRadius() > paddle.getLocationX())
+                    && (ball.getPositionX() < paddle.getLocationX() + paddle.getWidth() - 1)
+                    && (ball.getPositionY() + ball.getRadius() > paddle.getLocationY())) {
+                ball.setVelocityY(ball.getVelocityY() * -1);
+                this.isBallGoingDown = false;
             }
-            //Bounce if ball touches a wall
-            if ((this.ball.getPositionX() + this.ball.getRadius() > this.getWidth()) || (this.ball.getPositionX() < 0)
-                    || (this.ball.getPositionY() + this.ball.getRadius() > this.getHeight())
-                    || (this.ball.getPositionY() < 0)) {
-                xMovement *= -1;
-                yMovement *= -1; //TODO use delta x here instead
+            
+            //Bounce if ball touches a side walls
+            if ((this.ball.getPositionX() + this.ball.getRadius() > this.getWidth()) || (this.ball.getPositionX() < 0)) {
+                ball.setVelocityX(this.ball.getVelocityX() * -1);
             }
+            
+            //Bounce if ball touches roof
+            if (this.ball.getPositionY() < 0) {
+                ball.setVelocityY(this.ball.getVelocityY() * -1);
+                this.isBallGoingDown = true;
+            }
+            
+            //Bounce if ball touches top or bottom of brick
+            if (!isBallGoingDown) {
+                for (Brick brick : this.bricks) {
+                    if ((this.ball.getPositionX() + this.ball.getRadius() > brick.getLocationX()
+                            && (this.ball.getPositionX() + this.ball.getRadius() < brick.getLocationX() + BRICK_WIDTH - 1))  
+                            && (this.ball.getVelocityY() < 0
+                            && this.ball.getPositionY() < brick.getLocationY() + BRICK_HEIGHT - 1)
+                            && brick.isVisible() == true) {
+
+                        ball.setVelocityY(this.ball.getVelocityY() * -1);
+                        brick.setIsVisible(false);
+                        break;
+                    }
+                }
+            } else {
+                for (Brick brick : this.bricks) {
+                    if ((this.ball.getPositionX() + this.ball.getRadius() > brick.getLocationX()
+                            && (this.ball.getPositionX() < brick.getLocationX() + BRICK_WIDTH - 1))
+                            && (this.ball.getVelocityY() > 0
+                            && this.ball.getPositionY() + this.ball.getRadius() > brick.getLocationY())
+                            && brick.isVisible() == true) {
+
+                        ball.setVelocityY(this.ball.getVelocityY() * -1);
+                        brick.setIsVisible(false);
+                        break;
+                    }
+                }
+            }
+            /*            
+            //Bounce if ball touches side of brick
+                for (Brick brick : this.bricks) {
+                    if ((this.ball.getPositionY() + ball.getRadius() / 2 > brick.getLocationY()
+                            && (this.ball.getPositionY() + (ball.getRadius() / 2) < brick.getLocationY() + BRICK_HEIGHT - 1))
+                            && this.ball.getVelocityX() > 0
+                            && this.ball.getPositionX() + this.ball.getRadius() > brick.getLocationX()
+                            && brick.isVisible() == true) {
+
+                        ball.setVelocityX(this.ball.getVelocityX() * -1);
+                        brick.setIsVisible(false);
+                        break;
+                    }
+                } 
+                for (Brick brick : this.bricks) {
+                    if ((this.ball.getPositionY() + ball.getRadius() / 2 > brick.getLocationY()
+                            && (this.ball.getPositionY() + (ball.getRadius() / 2) < brick.getLocationY() + BRICK_HEIGHT - 1))
+                            && this.ball.getVelocityX() < 0
+                            && this.ball.getPositionX() < brick.getLocationX() + BRICK_WIDTH - 1
+                            && brick.isVisible() == true) {
+
+                        ball.setVelocityX(this.ball.getVelocityX() * -1);
+                        brick.setIsVisible(false);
+                        break;
+                    }
+                }
+            */
+            
+            //Finishing gameplay if ball reaches floor
+            if (this.ball.getPositionY() > this.getHeight()) {
+                break;
+            }
+            
+            
+            
             try {
                 Thread.sleep(15);
                 repaint();
@@ -168,5 +223,6 @@ public class Game extends JPanel implements Runnable {
             }
         });
         game.run();
+        
     }
 }
