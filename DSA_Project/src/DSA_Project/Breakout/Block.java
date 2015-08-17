@@ -40,7 +40,7 @@ public abstract class Block {
         return color;
     }
 
-    public boolean isIsVisible() {
+    public boolean isVisible() {
         return isVisible;
     }
     

@@ -12,6 +12,8 @@ public class Brick extends Block {
     //CONSTRUCTOR---------------------------------------------------------------
     public Brick(int locationX, int locationY, int width, int height, Color color, int score) {
         super(locationX, locationY, width, height, color);
+        this.score = score;
+        this.isSpecial = false;
     }
 
     //GETTERS-------------------------------------------------------------------
@@ -19,7 +21,7 @@ public class Brick extends Block {
         return score;
     }
 
-    public boolean isIsSpecial() {
+    public boolean isSpecial() {
         return isSpecial;
     }
 
