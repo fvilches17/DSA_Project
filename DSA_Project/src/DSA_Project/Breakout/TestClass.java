@@ -20,13 +20,8 @@ public class TestClass {
         System.out.println(balls2.get(0));
         */
         JFrame frame = new JFrame();
-        JFrame frame2 = new JFrame();
         Game game = new Game(frame, 1);
-        Game game2 = new Game(frame2, 1);
-        
         game.start();
-        game.stop();
-        game2.start();
         
         
     }

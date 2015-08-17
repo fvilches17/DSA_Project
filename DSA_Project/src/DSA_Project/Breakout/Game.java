@@ -16,9 +16,9 @@ import javax.swing.JPanel;
 public class Game extends JPanel implements Runnable {
 
     //FIELDS--------------------------------------------------------------------
-
     private Random random;
     private int gameScore = 0;
+    private int numberOfLives = 3;
     private Thread thread;
     private boolean isRunning;
 
@@ -128,6 +128,18 @@ public class Game extends JPanel implements Runnable {
         g.setColor(this.ball.getColor());
         g.fillOval((int) this.ball.getPositionX(), (int) this.ball.getPositionY(),
                 (int) this.ball.getRadius(), (int) this.ball.getRadius());
+        
+        //Painting number of lives
+        int livesIconPositionX = 5;
+        int livesIconPositionY = 5;
+        int livesIconRadius = 15;
+        int i = 0;
+        while (i < this.numberOfLives) {
+            g.setColor(BALL_COLOR);
+            g.fillOval(livesIconPositionX, livesIconPositionY, livesIconRadius, livesIconRadius);
+            livesIconPositionX += livesIconRadius + 5;
+            i++;
+        }
 
         //Painting Paddle
         g.setColor(this.paddle.getColor());
@@ -137,12 +149,12 @@ public class Game extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (isRunning) {
             this.ball.move();
 
             //Bounce if ball touches paddle
             if ((ball.getPositionX() + ball.getRadius() > paddle.getLocationX())
-                    && (ball.getPositionX() < paddle.getLocationX() + paddle.getWidth() - 1)
+                    && (ball.getPositionX() < paddle.getLocationX() + paddle.getWidth())
                     && (ball.getPositionY() + ball.getRadius() > paddle.getLocationY())
                     && (ball.getPositionY() < paddle.getLocationY())) {
                 ball.setVelocityY(ball.getVelocityY() * -1);
@@ -160,11 +172,12 @@ public class Game extends JPanel implements Runnable {
                 this.isBallGoingDown = true;
             }
 
-            //Bounce if ball touches top or bottom of brick
+            //Bounce if ball touches bottom of brick
             if (!isBallGoingDown) {
                 for (Brick brick : this.bricks) {
                     if ((this.ball.getPositionX() + this.ball.getRadius() / 2 > brick.getLocationX()
-                            && (this.ball.getPositionX() + this.ball.getRadius() / 2 < brick.getLocationX() + BRICK_WIDTH - 1))
+                            && (this.ball.getPositionX() + this.ball.getRadius() / 2 < brick.getLocationX() + BRICK_WIDTH))
+                            && (this.ball.getPositionY() + this.ball.getRadius() > bricks.get(0).getLocationY() + BRICK_HEIGHT)
                             && (this.ball.getVelocityY() < 0)
                             && (this.ball.getPositionY() < brick.getLocationY() + BRICK_HEIGHT - 1)
                             && brick.isVisible() == true) {
@@ -175,12 +188,13 @@ public class Game extends JPanel implements Runnable {
                         break;
                     }
                 }
+            //Bounce if ball touches top of brick
             } else {
                 for (Brick brick : this.bricks) {
                     if ((this.ball.getPositionX() + this.ball.getRadius() / 2 > brick.getLocationX()
-                            && (this.ball.getPositionX() + this.ball.getRadius() / 2 < brick.getLocationX() + BRICK_WIDTH - 1))
+                            && (this.ball.getPositionX() + this.ball.getRadius() / 2 < brick.getLocationX() + BRICK_WIDTH))
                             && (this.ball.getPositionY() + this.ball.getRadius() > brick.getLocationY())
-                            && (this.ball.getPositionY() + this.ball.getRadius() < bricks.get(bricks.size() - 1).getLocationY())
+                            && (this.ball.getPositionY() + this.ball.getRadius() < bricks.get(bricks.size() - 1).getLocationY() + BRICK_HEIGHT)
                             && (this.ball.getVelocityY() > 0)
                             && (brick.isVisible() == true)) {
 
@@ -191,41 +205,62 @@ public class Game extends JPanel implements Runnable {
                     }
                 }
             }
-            /*            
-             //Bounce if ball touches side of brick
-             for (Brick brick : this.bricks) {
-             if ((this.ball.getPositionY() + ball.getRadius() / 2 > brick.getLocationY()
-             && (this.ball.getPositionY() + (ball.getRadius() / 2) < brick.getLocationY() + BRICK_HEIGHT - 1))
-             && this.ball.getVelocityX() > 0
-             && this.ball.getPositionX() + this.ball.getRadius() > brick.getLocationX()
-             && brick.isVisible() == true) {
 
-             ball.setVelocityX(this.ball.getVelocityX() * -1);
-             brick.setIsVisible(false);
-             this.gameScore += brick.getScore();
-             break;
-             }
-             } 
-             for (Brick brick : this.bricks) {
-             if ((this.ball.getPositionY() + ball.getRadius() / 2 > brick.getLocationY()
-             && (this.ball.getPositionY() + (ball.getRadius() / 2) < brick.getLocationY() + BRICK_HEIGHT - 1))
-             && this.ball.getVelocityX() < 0
-             && this.ball.getPositionX() < brick.getLocationX() + BRICK_WIDTH - 1
-             && brick.isVisible() == true) {
+            //Bounce if ball touches right side of brick
+            if (this.ball.getVelocityX() > 0) {
+                for (Brick brick : this.bricks) {
+                    if ((this.ball.getPositionY() + ball.getRadius() / 2 > brick.getLocationY()
+                            && (this.ball.getPositionY() + (ball.getRadius() / 2) < brick.getLocationY() + BRICK_HEIGHT))
+                            && (this.ball.getPositionX() < brick.getLocationX())
+                            && (this.ball.getPositionX() + this.ball.getRadius() > brick.getLocationX())
+                            && (brick.isVisible() == true)) {
 
-             ball.setVelocityX(this.ball.getVelocityX() * -1);
-             brick.setIsVisible(false);
-             this.gameScore += brick.getScore();
-             break;
-             }
-             }
-             */
-
-            //Finishing gameplay if ball reaches floor
-            if (this.ball.getPositionY() > this.getHeight()) {
-                break;
+                        ball.setVelocityX(this.ball.getVelocityX() * -1);
+                        brick.setIsVisible(false);
+                        this.gameScore += brick.getScore();
+                        break;
+                    }
+                }
             }
+            //Bounce if ball touches left side of brick
+            if(this.ball.getVelocityX() < 0) {
+                for (Brick brick : this.bricks) {
+                    if ((this.ball.getPositionY() + ball.getRadius() / 2 > brick.getLocationY()
+                            && (this.ball.getPositionY() + ball.getRadius() / 2 < brick.getLocationY() + BRICK_HEIGHT))
+                            && (this.ball.getPositionX() + this.ball.getRadius() > brick.getLocationX() + BRICK_WIDTH)
+                            && (this.ball.getPositionX() < brick.getLocationX() + BRICK_WIDTH)
+                            && (brick.isVisible() == true)) {
 
+                        ball.setVelocityX(this.ball.getVelocityX() * -1);
+                        brick.setIsVisible(false);
+                        this.gameScore += brick.getScore();
+                        break;
+                    }
+                }
+
+            }
+            
+            //Deduct number of lives if ball ends up at bottom of screen
+            if (this.ball.getPositionY() > this.getHeight()) {
+                this.numberOfLives--;
+                this.ball.setPositionX(BALL_X_POSITION);
+                this.ball.setPositionX(BALL_Y_POSITION);                
+            }
+            
+            //Finishing gameplay if number of lives = 0
+            if(this.numberOfLives == 0)
+                    this.isRunning = false;
+            
+            //Finishing gameplay if no more bricks remaining
+            int visibleBricks = 0;
+            for(Brick brick : bricks) {
+                if(brick.isVisible())
+                    visibleBricks++;
+            }
+            if(visibleBricks == 0)
+                this.isRunning = false;
+            
+            //Setting screen refresh rate
             try {
                 Thread.sleep(10);
                 repaint();
@@ -239,6 +274,7 @@ public class Game extends JPanel implements Runnable {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Breakout!");
         Game game = new Game(frame, 1);
+        
         frame.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -252,8 +288,8 @@ public class Game extends JPanel implements Runnable {
                     game.repaint();
                 }
                 if (key == KeyEvent.VK_SPACE) {
-                    System.exit(1);
                     game.stop();
+                    System.exit(1);
                 }
             }
         });
