@@ -13,10 +13,15 @@ public class Ball implements Serializable {
     private double deltaT;
     private Color color;
     
-    //CONSTRUCTOR---------------------------------------------------------------
-    public Ball(double radius, Color color) {
-        this.setRadius(radius);
-        this.setColor(color);
+    //CONSTRUCTOR---------------------------------------------------------------`
+    public Ball(double positionX, double positionY, double velocityX, double velocityY, double radius, double deltaT, Color color) {
+        this.positionX = positionX;
+        this.positionY = positionY;
+        this.velocityX = velocityX; 
+        this.velocityY = velocityY;
+        this.radius = radius;
+        this.deltaT = deltaT;
+        this.color = color;
     }
     
     //GETTERS-------------------------------------------------------------------
