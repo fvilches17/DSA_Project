@@ -88,6 +88,8 @@ public class Ball implements Serializable {
         positionY += deltaT * velocityY;
     }
     
+    
+    
     @Override
     public String toString() { //Used for debugging purposes
         return "position(" + positionX + ", " + positionY + "), "
