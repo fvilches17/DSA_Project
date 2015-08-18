@@ -14,17 +14,17 @@ import javax.swing.JPanel;
 
 //CLASS-------------------------------------------------------------------------
 public class Game extends JPanel implements Runnable {
-
     //FIELDS--------------------------------------------------------------------
+    private boolean isRunning;
     private int gameScore = 0;
     private int numberOfLives = 3;
     private Thread thread;
-    private boolean isRunning;
     private Random random;
 
     //Setting Fields and default values for Frame
     private final int DEFAULT_FRAME_WIDTH = 1000;
     private final int DEFAULT_FRAME_HEIGHT = 700;
+    private final JFrame frame = new JFrame("Breakout!");
 
     //Setting Fields and default values for Bricks
     private final Color[] BRICK_COLORS = {Color.red, Color.blue, Color.green, Color.yellow, Color.cyan}; //Bricks with score values
@@ -45,7 +45,7 @@ public class Game extends JPanel implements Runnable {
     private final double BALL_DELTA = 1.0; //TODO de fines velocity, need to relate to level chosen by player
     private final Ball ball = new Ball(BALL_X_POSITION, BALL_Y_POSITION, BALL_X_VELOCITY,
             BALL_Y_VELOCITY, BALL_RADIUS, BALL_DELTA, BALL_COLOR);
-
+    
     //Setting Fields and default values for Paddle
     private final int PADDLE_WIDTH = 175;
     private final int PADDLE_HEIGHT = 10;
@@ -56,11 +56,16 @@ public class Game extends JPanel implements Runnable {
             PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
 
     //CONSTRUCTOR--------------------------------------------------------------
-    public Game(JFrame frame, int difficultyLevel) {
+    public Game(Difficulty difficulty) {
         //Setting difficulty level. The greater the difficulty the faster the ball moves
-        this.ball.setDeltaT(difficultyLevel * 0.5);
+        if(difficulty == Difficulty.EASY)
+            this.ball.setDeltaT(0.4);
+        else if(difficulty == Difficulty.MEDIUM)
+            this.ball.setDeltaT(0.6);
+        else if(difficulty == Difficulty.HARD)
+            this.ball.setDeltaT(0.8);
         
-        //Adjusting Panel settings
+        //Adjusting Panel settings and initializing creating brick values
         this.createBricks();
         this.setVisible(true);
 
@@ -88,6 +93,10 @@ public class Game extends JPanel implements Runnable {
         isRunning = false;
         thread = null;
     }
+    
+    public boolean isRunning() {
+        return this.isRunning;
+    }
 
     private void createBricks() {
         //Setting start location for bricks to be layed out.
@@ -105,7 +114,7 @@ public class Game extends JPanel implements Runnable {
             startPointY += BRICK_HEIGHT;
             startPointX = ((DEFAULT_FRAME_WIDTH - NUM_BRICKS_PER_LINE * BRICK_WIDTH) / 2) - BRICK_WIDTH / (BRICK_WIDTH / 10);
         }
-        //Choosing 1 special brick at random, assigning it the special brick color, and score value to 0
+        //Choosing 1 special brick at random, assigning it the special brick color, and score value of 0
         random = new Random();
         int specialBrick = random.nextInt(this.bricks.size());
         this.bricks.get(specialBrick).setIsSpecial(true);
@@ -204,6 +213,7 @@ public class Game extends JPanel implements Runnable {
                         ball.setVelocityY(this.ball.getVelocityY() * -1);
                         brick.setIsVisible(false);
                         this.gameScore += brick.getScore();
+                        //player.addScore(brick.getScore);
                         break;
                     }
                 }
@@ -247,7 +257,13 @@ public class Game extends JPanel implements Runnable {
             if (this.ball.getPositionY() > this.getHeight()) {
                 this.numberOfLives--;
                 this.ball.setPositionX(BALL_X_POSITION);
-                this.ball.setPositionX(BALL_Y_POSITION);                
+                this.ball.setPositionY(BALL_Y_POSITION);
+                this.ball.setVelocityX(ball.getVelocityX() * -1);
+                try {
+                    this.thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             
             //Finishing gameplay if number of lives = 0
@@ -275,10 +291,9 @@ public class Game extends JPanel implements Runnable {
 
     //MAIN METHOD---------------------------------------------------------------
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Breakout!");
-        Game game = new Game(frame, 1);
+        Game game = new Game(Difficulty.MEDIUM);
         
-        frame.addKeyListener(new KeyAdapter() {
+        game.frame.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 int key = e.getKeyCode();
@@ -296,18 +311,20 @@ public class Game extends JPanel implements Runnable {
                         game.repaint();
                     }
                 }
-                //Pause game
+                //Pause/Resume game
                 if (key == KeyEvent.VK_SPACE) {
-                    game.stop();
-                    //System.exit(1);
+                    if(game.isRunning)
+                        game.stop();
+                    else
+                        game.start();
                 }
-                //Resume game
-                if (key == KeyEvent.VK_ENTER) {
-                    game.start();
-                    //System.exit(1);
+                //Quit game
+                if (key == KeyEvent.VK_ESCAPE) {
+                    System.exit(1);
                 }
             }
         });
         game.start();
+        System.out.println("Game score = " + game.getScore());
     }
 }
