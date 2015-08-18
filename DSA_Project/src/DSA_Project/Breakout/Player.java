@@ -32,6 +32,7 @@ public class Player {
 		return score;
 	}
 
+        //int i === passes
 	public void addToScore (int i) {
 		if (i <= 0) {
 			throw new IllegalArgumentException ("I must be positive!");
