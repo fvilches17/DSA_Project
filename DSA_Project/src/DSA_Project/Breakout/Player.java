@@ -4,60 +4,108 @@ package DSA_Project.Breakout;
  *
  * @author olga
  */
-public class Player {
+public class Player implements Comparable<Player> {
+    //FIELDS--------------------------------------------------------------------
+    private String name;
+    private int score;
+    
+    //CONSTRUCTOR---------------------------------------------------------------
+    public Player(String name, int score) {
+        this.name = name;
+        this.score = score;
+    }
+    //GETTERS-------------------------------------------------------------------
+    public String name() {
+        return name;
+    }
 
-	private final String name;
-	private int score;
+    public int score() {
+        return score;
+    }
+    //SETTERS-------------------------------------------------------------------
+    public void addToScore(int i) {
+        if (i < 0) {
+            throw new IllegalArgumentException("Score must be 0 or greater!");
+        }
+        score += i;
+    }
 
-	private Player (String name) {
-		this.name = name;
-		score = 0;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    //METHODS-------------------------------------------------------------------
+    public static Player fromInput(String s) {
+        if (s == null) {
+            throw new IllegalArgumentException("s cannot be null");
+        }
+        if (s.length() == 0) {
+            throw new IllegalArgumentException("s cannot be empty");
+        }
+        return new Player(s, 0);
+    }
 
-	public static Player fromString (String name) {
-		if (name == null) {
-			throw new IllegalArgumentException ("Name cannot be null");
-		}
-		if (name.length() == 0) {
-			throw new IllegalArgumentException ("Name cannot be empty");
-		}
-		return new Player (name);
-	}
+    public static Player fromStringFile(String s) {
+        if (s == null) {
+            throw new IllegalArgumentException("s cannot be null");
+        }
+        if (s.length() == 0) {
+            throw new IllegalArgumentException("s cannot be empty");
+        }
+        String[] split = s.split("\n");
+        if (split.length != 2) {
+            throw new IllegalArgumentException("s should be two strings separated by new line.");
+        }
+        if (split[0].equals("")) {
+            throw new IllegalArgumentException("First part should not be empty.");
+        }
+        try {
+            int i = Integer.parseInt(split[1]);
+            if (i < 0) {
+                throw new IllegalArgumentException("Second part must be a positive integer!");
+            }
+            return new Player(split[0], i);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Second part must be an integer!");
+        }
+    }
 
-	public String name() {
-		return name;
-	}
+    @Override
+    public int compareTo(Player p) {
+        if (score > p.score) {
+            return -1;
+        }
+        if (score < p.score) {
+            return 1;
+        }
+        return 1;
+    }
 
-	public int score() {
-		return score;
-	}
+    public String representation() {
+        return "Player: " + name() + ", score: " + score();
+    }
 
-	public void addToScore (int i) {
-		if (i <= 0) {
-			throw new IllegalArgumentException ("I must be positive!");
-		}
-		score += i;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Player) {
+            Player ps = (Player) o;
+            if (ps.score == score) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof Player) {
-			Player p = (Player) o;
-			if (p.name.equals(name)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + name.hashCode();
+        hash = 23 * hash + score;
+        return hash;
+    }
 
-	@Override
-	public int hashCode() {
-		return name.hashCode();
-	}
-
-	@Override
-	public String toString() {
-		return "Player name: " + name + ", score: " + score;
-	}
-
+    @Override
+    public String toString() {
+        return name + "\n" + score;
+    }
 }

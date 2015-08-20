@@ -69,7 +69,4 @@ public abstract class Block {
     public void setIsVisible(boolean isVisible) {
         this.isVisible = isVisible;
     }
-    
-    //METHODS-------------------------------------------------------------------
-    //TODO add methods?
 }

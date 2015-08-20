@@ -5,7 +5,6 @@ import java.awt.Color;
 public class Brick extends Block {
 
     //FIELDS--------------------------------------------------------------------
-
     private int score;
     private boolean isSpecial;
 

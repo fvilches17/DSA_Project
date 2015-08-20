@@ -13,9 +13,10 @@ public class Ball implements Runnable {
     private double radius;
     private double deltaT;
     private boolean isRunning;
+    private boolean isBallGoingDown;
     private Color color;
     private Thread thread;
-    private Game game;
+    private final Game game;
     
     //CONSTRUCTOR---------------------------------------------------------------`
     public Ball(double positionX, double positionY, double velocityX, double velocityY, double radius, double deltaT, Color color, Game game) {
@@ -58,6 +59,10 @@ public class Ball implements Runnable {
         return color;
     }
 
+    public boolean isIsBallGoingDown() {
+        return isBallGoingDown;
+    }
+  
     //SETTERS-------------------------------------------------------------------
     public void setPositionX(double positionX) {
         this.positionX = positionX;
@@ -86,6 +91,12 @@ public class Ball implements Runnable {
     public void setColor(Color color) {
         this.color = color;
     }
+
+    public void setIsBallGoingDown(boolean isBallGoingDown) {
+        this.isBallGoingDown = isBallGoingDown;
+    }
+    
+    
 
     //CLASS METHODS-------------------------------------------------------------
     public void move() {
@@ -129,28 +140,28 @@ public class Ball implements Runnable {
     public void run() {
        while(isRunning) {
            this.move();
-           //Bounce if this.touches paddle
+           //Bounce if ball touches paddle
             if ((this.getPositionX() + this.getRadius() > this.game.getPaddle().getLocationX())
                     && (this.getPositionX() < this.game.getPaddle().getLocationX() + this.game.getPaddle().getWidth())
                     && (this.getPositionY() + this.getRadius() > this.game.getPaddle().getLocationY())
-                    && (this.getPositionY() < this.game.getPaddle().getLocationY())) {
+                    && (this.getPositionY() + this.getRadius()/1.5 < this.game.getPaddle().getLocationY())) {
                 this.setVelocityY(this.getVelocityY() * -1);
-                this.game.setIsBallGoingDown(false);
+                this.setIsBallGoingDown(false);
             }
 
-            //Bounce if this.touches a side walls
+            //Bounce if ball touches a side walls
             if ((this.getPositionX() + this.getRadius() > game.getWidth()) || (this.getPositionX() < 0)) {
                 this.setVelocityX(this.getVelocityX() * -1);
             }
 
-            //Bounce if this.touches roof
+            //Bounce if ball touches roof
             if (this.getPositionY() < 0) {
                 this.setVelocityY(this.getVelocityY() * -1);
-                game.setIsBallGoingDown(true);
+                this.setIsBallGoingDown(true);
             }
 
-            //Bounce if this.touches bottom of brick
-            if (!this.game.IsBallGoingDown()) {
+            //Bounce if ball touches bottom of brick
+            if (!this.isBallGoingDown) {
                 for (Brick brick : this.game.getBricks()) {
                     if ((this.getPositionX() + this.getRadius() / 2 > brick.getLocationX()
                             && (this.getPositionX() + this.getRadius() / 2 < brick.getLocationX() + this.game.getBRICK_WIDTH()))
@@ -161,11 +172,14 @@ public class Ball implements Runnable {
 
                         this.setVelocityY(this.getVelocityY() * -1);
                         brick.setIsVisible(false);
-                        this.game.setGameScore(this.game.getScore() + brick.getScore()); 
+                        this.game.getPlayer().addToScore(brick.getScore());
+                        //this.game.setGameScore(this.game.getScore() + brick.getScore());
+                        if(brick.isSpecial())
+                            this.game.setIsSpecialBallActivated(true);
                         break;
                     }
                 }
-            //Bounce if this.touches top of brick
+            //Bounce if ball touches top of brick
             } else {
                 for (Brick brick : this.game.getBricks()) {
                     if ((this.getPositionX() + this.getRadius() / 2 > brick.getLocationX()
@@ -177,13 +191,16 @@ public class Ball implements Runnable {
 
                         this.setVelocityY(this.getVelocityY() * -1);
                         brick.setIsVisible(false);
-                        this.game.setGameScore(this.game.getScore() + brick.getScore());
+                        this.game.getPlayer().addToScore(brick.getScore());
+                        //this.game.setGameScore(this.game.getScore() + brick.getScore());
+                        if(brick.isSpecial())
+                            this.game.setIsSpecialBallActivated(true);
                         break;
                     }
                 }
             }
 
-            //Bounce if this.touches right side of brick
+            //Bounce if ball touches right side of brick
             if (this.getVelocityX() > 0) {
                 for (Brick brick : this.game.getBricks()) {
                     if ((this.getPositionY() + this.getRadius() / 2 > brick.getLocationY()
@@ -194,12 +211,15 @@ public class Ball implements Runnable {
 
                         this.setVelocityX(this.getVelocityX() * -1);
                         brick.setIsVisible(false);
-                        this.game.setGameScore(this.game.getScore() + brick.getScore());
+                        this.game.getPlayer().addToScore(brick.getScore());
+                        //this.game.setGameScore(this.game.getScore() + brick.getScore());
+                        if(brick.isSpecial())
+                            this.game.setIsSpecialBallActivated(true);
                         break;
                     }
                 }
             }
-            //Bounce if this.touches left side of brick
+            //Bounce if ball touches left side of brick
             if(this.getVelocityX() < 0) {
                 for (Brick brick : this.game.getBricks()) {
                     if ((this.getPositionY() + this.getRadius() / 2 > brick.getLocationY()
@@ -210,12 +230,15 @@ public class Ball implements Runnable {
 
                         this.setVelocityX(this.getVelocityX() * -1);
                         brick.setIsVisible(false);
-                        this.game.setGameScore(this.game.getScore() + brick.getScore());
+                        this.game.getPlayer().addToScore(brick.getScore());
+                        //this.game.setGameScore(this.game.getScore() + brick.getScore());
+                        if(brick.isSpecial())
+                            this.game.setIsSpecialBallActivated(true);
                         break;
                     }
                 }
-
             }
+            
             //Deduct number of lives if ball ends up at bottom of screen
             if (this.getPositionY() > this.game.getHeight()) {
                 this.game.setNumberOfLives(this.game.getNumberOfLives() - 1);
@@ -228,7 +251,6 @@ public class Ball implements Runnable {
                     Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
             this.sleep(5);
        }
     }
